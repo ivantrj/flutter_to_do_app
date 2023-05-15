@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:to_do_app/app/app.bottomsheets.dart';
-import 'package:to_do_app/app/app.dialogs.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:to_do_app/app/app.locator.dart';
-import 'package:to_do_app/app/app.router.dart';
 import 'package:to_do_app/ui/common/app_colors.dart';
 import 'package:stacked_services/stacked_services.dart';
 
-void main() {
+import 'app/app.router.dart';
+import 'models/todo.adapter.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+  Hive.registerAdapter(TodoAdapter());
+  await Hive.openBox('todos');
+
   setupLocator();
-  setupDialogUi();
-  setupBottomSheetUi();
 
   runApp(const MyApp());
 }
@@ -20,7 +25,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      title: 'To Do App',
       theme: Theme.of(context).copyWith(
         primaryColor: kcBackgroundColor,
         focusColor: kcPrimaryColor,
@@ -28,7 +34,7 @@ class MyApp extends StatelessWidget {
               bodyColor: Colors.black,
             ),
       ),
-      initialRoute: Routes.startupView,
+      initialRoute: Routes.todosView,
       onGenerateRoute: StackedRouter().onGenerateRoute,
       navigatorKey: StackedService.navigatorKey,
       navigatorObservers: [
